@@ -17,5 +17,5 @@ func Initialize() {
 	port := config.GetEnv("PORT", "8080")
 
 	// Run the server
-	router.Run("localhost:" + port)
+	router.Run("0.0.0.0:" + port)
 }
