@@ -1,7 +1,7 @@
 package router
 
 import (
-	"os"
+	"crm-go/config"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,11 +13,8 @@ func Initialize() {
 	// Initialize Routes
 	InitializeRoutes(router)
 
-	// Get the port from the environment
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
+	// Get the port from environment variables
+	port := config.GetEnv("PORT", "8080")
 
 	// Run the server
 	router.Run("localhost:" + port)
