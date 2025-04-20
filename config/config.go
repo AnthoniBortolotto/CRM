@@ -16,7 +16,7 @@ func LoadEnv() {
 }
 
 // GetEnv gets an environment variable with a default value
-func GetEnv(key, defaultValue string) string {
+func GetEnv(key string, defaultValue string) string {
 	value := os.Getenv(key)
 	if value == "" {
 		return defaultValue
