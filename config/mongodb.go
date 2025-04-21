@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -17,12 +18,18 @@ func ConnectDB() error {
 	password := os.Getenv("DB_PASSWORD")
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
+	database := os.Getenv("DB_DATABASE")
 
 	// Create MongoDB connection string
-	uri := fmt.Sprintf("mongodb://%s:%s@%s:%s", username, password, host, port)
-
+	uri := fmt.Sprintf("mongodb://%s:%s/%s", host, port, database)
+	log.Println(uri)
+	//	uri := "mongodb://localhost:27017/lead_crm"
+	credential := options.Credential{
+		Username: username,
+		Password: password,
+	}
 	// Set client options
-	clientOptions := options.Client().ApplyURI(uri)
+	clientOptions := options.Client().ApplyURI(uri).SetAuth(credential)
 
 	// Connect to MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -46,5 +53,5 @@ func ConnectDB() error {
 }
 
 func GetDB() *mongo.Database {
-	return Client.Database(os.Getenv("MONGO_DATABASE"))
+	return Client.Database(os.Getenv("DB_DATABASE"))
 }
