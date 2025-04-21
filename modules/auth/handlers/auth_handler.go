@@ -5,6 +5,7 @@ import (
 
 	"crm-go/modules/auth/models"
 	"crm-go/modules/auth/repositories"
+	"crm-go/modules/auth/utils"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -20,8 +21,54 @@ func NewAuthHandler() *AuthHandler {
 	}
 }
 
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+
 func (h *AuthHandler) Login(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "login"})
+	var req LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Find user by email
+	user, err := h.userRepo.FindByEmail(req.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error finding user"})
+		return
+	}
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		return
+	}
+
+	// Compare password
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		return
+	}
+
+	// Generate JWT token
+	token, err := utils.GenerateToken(user.ID.Hex(), user.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating token"})
+		return
+	}
+
+	// Remove password from user object
+	user.Password = ""
+
+	// Return token and user info
+	c.JSON(http.StatusOK, LoginResponse{
+		Token: token,
+	})
 }
 
 func (h *AuthHandler) Register(c *gin.Context) {
