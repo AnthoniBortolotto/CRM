@@ -1,8 +1,8 @@
 package router
 
 import (
-	auth_routes "crm-go/modules/auth/routes"
-	lead_routes "crm-go/modules/lead/routes"
+	auth_routes "crm-go/modules/auth/v1/routes"
+	lead_routes "crm-go/modules/lead/v1/routes"
 
 	"github.com/gin-gonic/gin"
 )

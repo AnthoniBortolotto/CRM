@@ -3,9 +3,9 @@ package handlers
 import (
 	"net/http"
 
-	"crm-go/modules/auth/models"
-	"crm-go/modules/auth/repositories"
-	"crm-go/modules/auth/utils"
+	"crm-go/modules/auth/v1/models"
+	"crm-go/modules/auth/v1/repositories"
+	"crm-go/modules/auth/v1/utils"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"

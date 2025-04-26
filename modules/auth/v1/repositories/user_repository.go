@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 	"crm-go/config"
-	"crm-go/modules/auth/models"
+	"crm-go/modules/auth/v1/models"
 	"log"
 	"time"
 
