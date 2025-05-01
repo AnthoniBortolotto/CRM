@@ -6,12 +6,18 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Claims struct {
 	UserID string `json:"user_id"`
 	Email  string `json:"email"`
 	jwt.RegisteredClaims
+}
+
+type TokenDecoded struct {
+	UserID primitive.ObjectID `json:"user_id"`
+	Email  string             `json:"email"`
 }
 
 func GenerateToken(userID string, email string) (string, error) {
@@ -43,23 +49,16 @@ func GenerateToken(userID string, email string) (string, error) {
 	return tokenString, nil
 }
 
-func ValidateToken(tokenString string) (*Claims, error) {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		secret = "your-secret-key" // Default secret for development
-	}
-
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(secret), nil
-	})
-
+func ValidateToken(tokenString string) (*TokenDecoded, error) {
+	// Mocked validation
+	userIdString := "68069217e5b753eed822d5d1" // Example ObjectID string
+	userId, err := primitive.ObjectIDFromHex(userIdString)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing token: %v", err)
+		return nil, fmt.Errorf("error converting string to ObjectID: %v", err)
 	}
-
-	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-		return claims, nil
-	}
-
-	return nil, fmt.Errorf("invalid token")
+	return &TokenDecoded{
+		// convert string to ObjectID
+		UserID: userId,
+		Email:  "user@example.com",
+	}, nil
 }

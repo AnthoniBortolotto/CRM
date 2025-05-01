@@ -9,7 +9,7 @@ import (
 func RegisterAuthRoutes(router *gin.RouterGroup) {
 	handler := handlers.NewAuthHandler()
 
-	auth := router.Group("/auth")
+	auth := router.Group("/auth/v1")
 	{
 		auth.POST("/login", handler.Login)
 		auth.POST("/register", handler.Register)

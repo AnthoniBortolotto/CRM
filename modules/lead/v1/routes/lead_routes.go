@@ -9,8 +9,9 @@ import (
 func RegisterLeadRoutes(router *gin.RouterGroup) {
 	handler := handlers.NewLeadHandler()
 
-	lead := router.Group("/lead")
+	lead := router.Group("/lead/v1")
 	{
 		lead.GET("", handler.GetLead)
+		lead.POST("", handler.CreateLead)
 	}
 }

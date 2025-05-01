@@ -48,3 +48,16 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 	}
 	return &user, nil
 }
+
+func (r *UserRepository) FindByID(id primitive.ObjectID) (*models.User, error) {
+	var user models.User
+	err := r.collection.FindOne(context.Background(), bson.M{"_id": id}).Decode(&user)
+	if err != nil {
+		log.Println("Error finding user by ID:", err)
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &user, nil
+}
