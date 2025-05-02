@@ -4,6 +4,7 @@ import (
 	"crm-go/modules/auth/v1/utils"
 	"crm-go/modules/lead/v1/models"
 	"crm-go/modules/lead/v1/repositories"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -27,16 +28,24 @@ func (h *LeadHandler) GetLead(c *gin.Context) {
 func (h *LeadHandler) CreateLead(c *gin.Context) {
 	var req models.CreateLeadRequest
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+	// Get token from header
+	token := c.GetHeader("Authorization")
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing token"})
 		return
 	}
-	println("Creating lead with request:")
-	// Validate authentication token
-	decodedToken, err := utils.ValidateToken(req.AuthenticationToken)
+
+	// Validate token
+	decodedToken, err := utils.ValidateToken(token)
 	println("Decoded token:", decodedToken)
 	if err != nil {
-		c.JSON(401, gin.H{"error": "Invalid token"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		return
+	}
+
+	// Validate request body
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -53,15 +62,13 @@ func (h *LeadHandler) CreateLead(c *gin.Context) {
 		ID:          primitive.NewObjectID(),
 		TotalPrice:  req.TotalPrice,
 	}
-	println("Lead to be created:", lead)
+
 	// Insert lead into the database
 	generatedLead, err := h.leadRepo.CreateLead(lead)
-	println("Generated lead:")
 	if err != nil {
-		println("Error creating lead:", err)
-		c.JSON(500, gin.H{"error": "Error creating lead"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating lead"})
 		return
 	}
-	println("Lead created successfully:")
-	c.JSON(200, gin.H{"message": "lead created successfully", "lead": generatedLead})
+
+	c.JSON(http.StatusOK, gin.H{"message": "lead created successfully", "lead": generatedLead})
 }

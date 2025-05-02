@@ -50,15 +50,44 @@ func GenerateToken(userID string, email string) (string, error) {
 }
 
 func ValidateToken(tokenString string) (*TokenDecoded, error) {
-	// Mocked validation
-	userIdString := "68069217e5b753eed822d5d1" // Example ObjectID string
-	userId, err := primitive.ObjectIDFromHex(userIdString)
-	if err != nil {
-		return nil, fmt.Errorf("error converting string to ObjectID: %v", err)
+	// Get JWT secret from environment variable
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		secret = "your-secret-key" // Default secret for development
 	}
+
+	// Parse and validate the token
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		// Validate the signing method
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(secret), nil
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("error parsing token: %v", err)
+	}
+
+	// Check if token is valid
+	if !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
+	// Extract claims
+	claims, ok := token.Claims.(*Claims)
+	if !ok {
+		return nil, fmt.Errorf("invalid token claims")
+	}
+
+	// Convert user ID string to ObjectID
+	userID, err := primitive.ObjectIDFromHex(claims.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("error converting user ID to ObjectID: %v", err)
+	}
+
 	return &TokenDecoded{
-		// convert string to ObjectID
-		UserID: userId,
-		Email:  "user@example.com",
+		UserID: userID,
+		Email:  claims.Email,
 	}, nil
 }

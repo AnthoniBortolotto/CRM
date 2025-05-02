@@ -25,13 +25,12 @@ type Lead struct {
 }
 
 type CreateLeadRequest struct {
-	Email               string  `json:"email" binding:"required,email"`
-	Phone               string  `json:"phone" binding:"required"`
-	ClientName          string  `json:"client_name" binding:"required"`
-	ProductName         string  `json:"product_name" binding:"required"`
-	LeadSource          string  `json:"lead_source" binding:"required"`
-	TotalPrice          float64 `json:"total_price" binding:"required"`
-	Discount            float64 `json:"discount"`
-	Notes               string  `json:"notes"`
-	AuthenticationToken string  `json:"authentication_token" binding:"required"`
+	Email       string  `json:"email" binding:"required,email"`
+	Phone       string  `json:"phone" binding:"required"`
+	ClientName  string  `json:"client_name" binding:"required"`
+	ProductName string  `json:"product_name" binding:"required"`
+	LeadSource  string  `json:"lead_source" binding:"required"`
+	TotalPrice  float64 `json:"total_price" binding:"required"`
+	Discount    float64 `json:"discount"`
+	Notes       string  `json:"notes"`
 }
