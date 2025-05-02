@@ -22,7 +22,43 @@ func NewLeadHandler() *LeadHandler {
 }
 
 func (h *LeadHandler) GetLead(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "lead"})
+	// Get token from header
+	leadId := c.Param("leadId")
+	leadIdObjID, err := primitive.ObjectIDFromHex(leadId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid lead ID"})
+		return
+	}
+	token := c.GetHeader("Authorization")
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing token"})
+		return
+	}
+
+	// Validate token
+	decodedToken, err := utils.ValidateToken(token)
+	println("Decoded token:", decodedToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		return
+	}
+
+	lead, err := h.leadRepo.GetLeadByID(leadIdObjID)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error getting lead"})
+		return
+	}
+	if lead == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Lead not found"})
+		return
+	}
+	// Check if the lead belongs to the user
+	if lead.LeadOwnerID != decodedToken.UserID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have permission to access this lead"})
+		return
+	}
+	c.JSON(200, gin.H{"message": "lead found", "lead": lead})
 }
 
 func (h *LeadHandler) CreateLead(c *gin.Context) {

@@ -11,7 +11,7 @@ func RegisterLeadRoutes(router *gin.RouterGroup) {
 
 	lead := router.Group("/lead/v1")
 	{
-		lead.GET("", handler.GetLead)
+		lead.GET(":leadId", handler.GetLead)
 		lead.POST("", handler.CreateLead)
 	}
 }
