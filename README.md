@@ -13,6 +13,16 @@ crm-go/
 └── main.go       # Application entry point
 ```
 
+```
+├── module-name/
+│   ├── version/
+│    ├── handlers/
+│    ├── models/
+│    ├── routes/
+│    ├── services/
+│    └── repositories/
+```
+
 ## Features
 
 - User Authentication (Register, Login)
@@ -27,14 +37,11 @@ crm-go/
 
 - Docker and Docker Compose
 - Git
+- GO
 
 ## Setup Instructions
 
 1. Clone the repository:
-```bash
-git clone <repository-url>
-cd crm-go
-```
 
 2. Set up environment variables:
 Create a `.env` file in the root directory following the format of the .env.example file
@@ -76,4 +83,4 @@ go run main.go
 
 ## Note
 
-This is a learning project and it's meant to demonstrate basic concepts and serve as a starting point for learning Go and MongoDB. 
+This is a learning project and it's meant to demonstrate basic concepts and serve as a starting point for learning and develop an API using Go and MongoDB. 
