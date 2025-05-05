@@ -19,7 +19,6 @@ crm-go/
 │    ├── handlers/
 │    ├── models/
 │    ├── routes/
-│    ├── services/
 │    └── repositories/
 ```
 
